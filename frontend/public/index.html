@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BullNest – India's Smart Market Hub</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300E5A0'/><text y='24' x='4' font-size='22' font-family='Arial' font-weight='bold' fill='%230B0E17'>B</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+<!-- ===== TOAST NOTIFICATIONS ===== -->
+<div id="toast-container"></div>
+
+<!-- ===== LOADING OVERLAY ===== -->
+<div id="loading-overlay" class="loading-overlay hidden">
+  <div class="spinner"></div>
+</div>
+
+<!-- ===== MODAL OVERLAY ===== -->
+<div id="modal-overlay" class="modal-overlay hidden">
+  <div id="modal-box" class="modal-box"></div>
+</div>
+
+<!-- ===== NAVBAR ===== -->
+<nav id="navbar">
+  <div class="nav-brand">
+    <a href="https://bullnest.in" target="_blank" class="logo">
+      <img src="/logo.png" alt="BullNest Logo" style="height: 32px; margin-right: 10px; vertical-align: middle;">
+      Bull<span>Nest.in</span>
+    </a>
+    <div class="nav-tagline">India's Smart Market Hub</div>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#" class="nav-link active" data-page="dashboard">Markets</a></li>
+    <li><a href="#" class="nav-link" data-page="market">Stocks & Crypto</a></li>
+    <li><a href="#" class="nav-link" data-page="portfolio">Portfolio</a></li>
+    <li><a href="#" class="nav-link" data-page="transactions">Transactions</a></li>
+    <li><a href="#" class="nav-link admin-link hidden" data-page="admin">Admin</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="wallet-badge" id="walletBadge" onclick="openDepositModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12h.01"/></svg>
+      <span id="navBalance">₹0</span>
+    </div>
+    <div class="user-menu hidden" id="userMenu">
+      <div class="user-avatar" id="userAvatar">U</div>
+      <span id="userName">User</span>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+    <div id="authButtons">
+      <button class="btn-outline" onclick="navigate('login')">Login</button>
+      <button class="btn-primary" onclick="navigate('register')">Get Started</button>
+    </div>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ===== LIVE TICKER ===== -->
+<div class="ticker-bar" id="tickerBar">
+  <div class="ticker-inner" id="tickerContent">
+    <span class="ticker-loading">Loading live prices...</span>
+  </div>
+</div>
+
+<!-- ===== PAGES CONTAINER ===== -->
+<div id="app">
+
+  <!-- ========== DASHBOARD PAGE ========== -->
+  <div id="page-dashboard" class="page active">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-badge"><span class="pulse-dot"></span> NSE & BSE Live · Real-time Prices</div>
+        <h1>India's Smartest<br><em>Investment Platform</em></h1>
+        <p class="hero-sub">Trade Stocks, Crypto & IPOs with real-time data. Start with ₹1,00,000 paper money — completely free.</p>
+        <div class="hero-btns" id="heroBtns">
+          <button class="btn-primary btn-lg" onclick="navigate('register')">Start Investing Free</button>
+          <button class="btn-outline btn-lg" onclick="navigate('market')">Explore Markets</button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-chart-box">
+          <div class="hcb-header">
+            <span class="hcb-name">NIFTY 50</span>
+            <span class="hcb-val up" id="heroNifty">22,317 ▲ +1.2%</span>
+          </div>
+          <canvas id="heroChart" height="120"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Market Summary -->
+    <section class="section">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Sensex</div>
+          <div class="stat-val up" id="statSensex">73,428</div>
+          <div class="stat-chg up">▲ +0.88%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Nifty 50</div>
+          <div class="stat-val up" id="statNifty">22,317</div>
+          <div class="stat-chg up">▲ +1.20%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Bank Nifty</div>
+          <div class="stat-val down" id="statBankNifty">47,821</div>
+          <div class="stat-chg down">▼ -0.44%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">India VIX</div>
+          <div class="stat-val gold">14.2</div>
+          <div class="stat-chg muted">Stable</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top Movers -->
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">Top Movers <span>Today</span></h2>
+        <button class="see-all" onclick="navigate('market')">View All →</button>
+      </div>
+      <div class="tab-row">
+        <button class="tab active" onclick="filterMovers('gainers',this)">Gainers</button>
+        <button class="tab" onclick="filterMovers('losers',this)">Losers</button>
+        <button class="tab" onclick="filterMovers('stocks',this)">Stocks</button>
+        <button class="tab" onclick="filterMovers('crypto',this)">Crypto</button>
+      </div>
+      <div class="cards-grid" id="moversGrid">
+        <div class="skeleton-card"></div><div class="skeleton-card"></div>
+        <div class="skeleton-card"></div><div class="skeleton-card"></div>
+      </div>
+    </section>
+
+    <!-- Chart + Portfolio Side by Side -->
+    <section class="section two-col-section">
+      <div class="chart-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title" id="chartAssetName">RELIANCE INDUSTRIES</div>
+            <div class="panel-price" id="chartPrice">₹2,934</div>
+            <div class="panel-chg up" id="chartChange">▲ +1.52% Today</div>
+          </div>
+          <div class="period-row">
+            <button class="period active" onclick="setPeriod('1D',this)">1D</button>
+            <button class="period" onclick="setPeriod('1W',this)">1W</button>
+            <button class="period" onclick="setPeriod('1M',this)">1M</button>
+            <button class="period" onclick="setPeriod('3M',this)">3M</button>
+          </div>
+        </div>
+        <div style="position:relative;height:240px">
+          <canvas id="mainStockChart"></canvas>
+        </div>
+        <div class="chart-asset-list" id="chartAssetList"></div>
+      </div>
+      <div class="portfolio-panel" id="dashPortfolioPanel">
+        <div class="panel-header">
+          <div class="panel-title">My Portfolio</div>
+          <button class="see-all" onclick="navigate('portfolio')">Details →</button>
+        </div>
+        <div id="dashPortfolioContent">
+          <div class="login-prompt">
+            <p>Login to see your portfolio</p>
+            <button class="btn-primary" onclick="navigate('login')">Login</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Crypto Section -->
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">Crypto <span>Market</span></h2>
+        <button class="see-all" onclick="navigate('market')">View All →</button>
+      </div>
+      <div class="crypto-grid" id="dashCryptoGrid">
+        <div class="skeleton-card"></div><div class="skeleton-card"></div>
+        <div class="skeleton-card"></div><div class="skeleton-card"></div>
+      </div>
+    </section>
+
+    <!-- News -->
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">Market <span>News</span></h2>
+      </div>
+      <div class="news-grid" id="newsGrid"></div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact-section">
+      <div class="contact-inner">
+        <div class="contact-left">
+          <div class="contact-label">Get In Touch</div>
+          <h2 class="contact-heading">Talk to the<br><em>BullNest Team</em></h2>
+          <p class="contact-desc">Questions about trading, account support, or partnerships? Reach out to our founder directly.</p>
+          <div class="owner-card">
+            <div class="owner-avatar">ZG</div>
+            <div class="owner-info">
+              <div class="owner-role">Founder & Owner</div>
+              <div class="owner-name">Ziyan Gupta</div>
+              <div class="owner-title">CEO, BullNest Technologies</div>
+            </div>
+          </div>
+          <div class="contact-items">
+            <div class="contact-item">
+              <div class="ci-icon phone-icon">📞</div>
+              <div>
+                <div class="ci-label">Phone / WhatsApp</div>
+                <div class="ci-val">+91 63596 62010</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="ci-icon email-icon">✉</div>
+              <div>
+                <div class="ci-label">Email</div>
+                <div class="ci-val">ziyan@bullnest.in</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="ci-icon loc-icon">📍</div>
+              <div>
+                <div class="ci-label">Office</div>
+                <div class="ci-val" style="font-family:'Inter',sans-serif;font-size:13px">Ahmedabad, Gujarat, India</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="contact-right">
+          <div class="contact-form-box">
+            <div class="form-title">Send a Message</div>
+            <div class="form-group"><label>Full Name</label><input type="text" placeholder="Your name" /></div>
+            <div class="form-group"><label>Phone / Email</label><input type="text" placeholder="Contact info" /></div>
+            <div class="form-group"><label>Message</label><textarea rows="4" placeholder="Your message..."></textarea></div>
+            <button class="btn-primary btn-full" onclick="this.textContent='Message Sent! ✓';setTimeout(()=>this.textContent='Send Message',2500)">Send Message</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ========== LOGIN PAGE ========== -->
+  <div id="page-login" class="page">
+    <div class="auth-page">
+      <div class="auth-left">
+        <div class="logo" style="font-size:32px">Bull<span>Nest</span></div>
+        <h2>Welcome back,<br>Smart Investor</h2>
+        <p>India's most intuitive trading platform. Stocks, Crypto, IPOs — all in one place.</p>
+        <div class="auth-stats">
+          <div class="as-item"><span class="as-val">₹1L</span><span class="as-label">Free Paper Money</span></div>
+          <div class="as-item"><span class="as-val">25+</span><span class="as-label">Assets to Trade</span></div>
+          <div class="as-item"><span class="as-val">Live</span><span class="as-label">Real-time Prices</span></div>
+        </div>
+      </div>
+      <div class="auth-right">
+        <div class="auth-card">
+          <h3>Sign In</h3>
+          <p class="auth-sub">New here? <a href="#" onclick="navigate('register')">Create account →</a></p>
+          <div class="demo-hint">
+            <strong>Demo:</strong> demo@bullnest.in / Demo@123 &nbsp;|&nbsp; <strong>Admin:</strong> admin@bullnest.in / Admin@123
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="loginEmail" placeholder="you@example.com" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" />
+          </div>
+          <button class="btn-primary btn-full btn-lg" onclick="doLogin()">Sign In</button>
+          <div class="auth-divider">or</div>
+          <button class="btn-outline btn-full" onclick="quickLogin('demo')">Use Demo Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== REGISTER PAGE ========== -->
+  <div id="page-register" class="page">
+    <div class="auth-page">
+      <div class="auth-left">
+        <div class="logo" style="font-size:32px">Bull<span>Nest</span></div>
+        <h2>Start Your<br>Investment Journey</h2>
+        <p>Get ₹1,00,000 paper money instantly. No real money needed. Practice trading risk-free.</p>
+        <div class="auth-stats">
+          <div class="as-item"><span class="as-val">Free</span><span class="as-label">Zero Cost</span></div>
+          <div class="as-item"><span class="as-val">Live</span><span class="as-label">Market Data</span></div>
+          <div class="as-item"><span class="as-val">Safe</span><span class="as-label">Secure & Private</span></div>
+        </div>
+      </div>
+      <div class="auth-right">
+        <div class="auth-card">
+          <h3>Create Account</h3>
+          <p class="auth-sub">Already have one? <a href="#" onclick="navigate('login')">Sign in →</a></p>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="regName" placeholder="Ziyan Gupta" />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="regEmail" placeholder="you@example.com" />
+          </div>
+          <div class="form-group">
+            <label>Phone (Optional)</label>
+            <input type="text" id="regPhone" placeholder="+91 63596 62010" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="regPassword" placeholder="Min. 6 characters" />
+          </div>
+          <button class="btn-primary btn-full btn-lg" onclick="doRegister()">Create Free Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MARKET PAGE ========== -->
+  <div id="page-market" class="page">
+    <div class="page-header">
+      <h1>Markets <span>Live</span></h1>
+      <p>Real-time prices updated every 3 seconds via WebSocket</p>
+    </div>
+    <div class="market-controls">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="marketSearch" placeholder="Search stocks, crypto..." oninput="filterMarket()" />
+      </div>
+      <div class="filter-group">
+        <button class="filter-btn active" onclick="setMarketFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setMarketFilter('stock',this)">Stocks</button>
+        <button class="filter-btn" onclick="setMarketFilter('crypto',this)">Crypto</button>
+        <button class="filter-btn" onclick="setMarketFilter('gainers',this)">Gainers</button>
+        <button class="filter-btn" onclick="setMarketFilter('losers',this)">Losers</button>
+      </div>
+      <select class="sort-select" onchange="sortMarket(this.value)">
+        <option value="name">Sort: Name</option>
+        <option value="price_high">Price: High→Low</option>
+        <option value="price_low">Price: Low→High</option>
+        <option value="change_high">Change: High→Low</option>
+        <option value="change_low">Change: Low→High</option>
+      </select>
+    </div>
+    <div class="market-table-wrap">
+      <table class="market-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Asset</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th>24h Change</th>
+            <th>Volume</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="marketTableBody">
+          <tr><td colspan="7" class="table-loading">Loading assets...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ========== PORTFOLIO PAGE ========== -->
+  <div id="page-portfolio" class="page">
+    <div class="page-header">
+      <h1>My <span>Portfolio</span></h1>
+      <p>Track your investments and profit/loss in real-time</p>
+    </div>
+    <div id="portfolioContent">
+      <div class="login-prompt-full">
+        <h3>Please login to view your portfolio</h3>
+        <button class="btn-primary" onclick="navigate('login')">Login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TRANSACTIONS PAGE ========== -->
+  <div id="page-transactions" class="page">
+    <div class="page-header">
+      <h1>Transaction <span>History</span></h1>
+      <p>Complete record of all your trades and deposits</p>
+    </div>
+    <div class="txn-controls">
+      <div class="filter-group">
+        <button class="filter-btn active" onclick="setTxnFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setTxnFilter('buy',this)">Buys</button>
+        <button class="filter-btn" onclick="setTxnFilter('sell',this)">Sells</button>
+        <button class="filter-btn" onclick="setTxnFilter('deposit',this)">Deposits</button>
+      </div>
+    </div>
+    <div id="txnContent">
+      <div class="login-prompt-full">
+        <h3>Please login to view transactions</h3>
+        <button class="btn-primary" onclick="navigate('login')">Login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ADMIN PAGE ========== -->
+  <div id="page-admin" class="page">
+    <div class="page-header">
+      <h1>Admin <span>Panel</span></h1>
+      <p>BullNest platform management — Ziyan Gupta</p>
+    </div>
+    <div id="adminContent">
+      <div class="login-prompt-full"><h3>Admin access required</h3></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <div class="logo">Bull<span>Nest</span></div>
+      <p>India's smartest trading simulation platform. Built with ❤ for finance learners and investors.</p>
+      <div class="foot-contact">
+        <div>📞 +91 63596 62010</div>
+        <div>✉ ziyan@bullnest.in</div>
+      </div>
+    </div>
+    <div class="foot-col"><h4>Trade</h4><ul><li onclick="navigate('market')">Stocks</li><li onclick="navigate('market')">Crypto</li><li onclick="navigate('market')">IPO</li></ul></div>
+    <div class="foot-col"><h4>Account</h4><ul><li onclick="navigate('portfolio')">Portfolio</li><li onclick="navigate('transactions')">History</li><li onclick="openDepositModal()">Add Money</li></ul></div>
+    <div class="foot-col"><h4>Company</h4><ul><li>About</li><li>Contact</li><li>Careers</li></ul></div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2025 BullNest.in · Founded by <strong>Ziyan Gupta</strong> · College Project</span>
+    <span>Investments are subject to market risk. Paper trading only.</span>
+  </div>
+</footer>
+
+<!-- Socket.io -->
+<script src="/socket.io/socket.io.js"></script>
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<!-- App JS -->
+<script src="/js/api.js"></script>
+<script src="/js/charts.js"></script>
+<script src="/js/market.js"></script>
+<script src="/js/portfolio.js"></script>
+<script src="/js/admin.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

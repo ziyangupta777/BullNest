@@ -1,0 +1,13 @@
+{
+  "name": "bullnest",
+  "version": "1.0.0",
+  "description": "BullNest – India's Smart Market Hub. Full-stack trading simulation platform.",
+  "scripts": {
+    "install-deps": "cd backend && npm install",
+    "seed": "cd backend && npm run seed",
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev"
+  },
+  "author": "Ziyan Gupta <ziyan@bullnest.in>",
+  "license": "MIT"
+}
