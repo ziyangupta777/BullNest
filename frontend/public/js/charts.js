@@ -21,36 +21,65 @@ const Charts = {
     return d;
   },
 
-  // Hero chart
+  genCandleData(count, base) {
+    const data = [];
+    let curr = base;
+    const now = luxon.DateTime.now();
+    for (let i = 0; i < count; i++) {
+      const volatility = base * 0.008;
+      const open = curr + (Math.random() - 0.5) * volatility;
+      const close = open + (Math.random() - 0.48) * volatility * 1.5;
+      const high = Math.max(open, close) + Math.random() * volatility * 0.5;
+      const low = Math.min(open, close) - Math.random() * volatility * 0.5;
+      data.push({
+        x: now.minus({ minutes: (count - i) * 15 }).toMillis(),
+        o: parseFloat(open.toFixed(2)),
+        h: parseFloat(high.toFixed(2)),
+        l: parseFloat(low.toFixed(2)),
+        c: parseFloat(close.toFixed(2))
+      });
+      curr = close;
+    }
+    return data;
+  },
+
+  // Hero chart (Nifty 50 Candlestick)
   hero(canvasId) {
     this.destroy(canvasId);
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
-    const data = this.genSparkData(30, 22000, true);
+    const data = this.genCandleData(20, 22000);
+    const allVals = data.flatMap(d => [d.o, d.h, d.l, d.c]);
+    const minVal = Math.min(...allVals);
+    const maxVal = Math.max(...allVals);
+    const padding = (maxVal - minVal) * 0.1;
+
     this.instances[canvasId] = new Chart(ctx, {
-      type: 'line',
+      type: 'candlestick',
       data: {
-        labels: Array(30).fill(''),
         datasets: [{
-          data,
-          borderColor: '#00E5A0',
-          borderWidth: 2,
-          fill: true,
-          backgroundColor: (c) => {
-            const g = c.chart.ctx.createLinearGradient(0, 0, 0, 120);
-            g.addColorStop(0, 'rgba(0,229,160,.18)');
-            g.addColorStop(1, 'rgba(0,229,160,0)');
-            return g;
-          },
-          tension: 0.4,
-          pointRadius: 0
+          label: 'NIFTY 50',
+          data: data,
+          color: {
+            up: '#00C896',
+            down: '#FF4757',
+            unchanged: '#6B7280',
+          }
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: { padding: { top: 10, bottom: 10 } },
         plugins: { legend: { display: false } },
-        scales: { x: { display: false }, y: { display: false } }
+        scales: {
+          x: { display: false, type: 'timeseries' },
+          y: { 
+            display: false,
+            min: minVal - padding,
+            max: maxVal + padding
+          }
+        }
       }
     });
   },

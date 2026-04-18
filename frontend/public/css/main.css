@@ -114,16 +114,17 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .page.active { display: block; }
 
 /* ===== HERO ===== */
-.hero { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; padding: 80px 40px 60px; max-width: 1200px; margin: 0 auto; }
+.hero { display: flex; align-items: center; justify-content: space-between; gap: 40px; padding: 100px 40px; max-width: 1200px; margin: 0 auto; min-height: 480px; }
 .hero-badge { display: inline-flex; align-items: center; gap: 7px; border: 1px solid rgba(0,229,160,.25); background: var(--accent-dim); color: var(--accent); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; margin-bottom: 20px; }
 .pulse-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(.8); } }
-h1 { font-family: 'Syne', sans-serif; font-size: clamp(28px, 4vw, 56px); font-weight: 800; line-height: 1.1; letter-spacing: -2px; margin-bottom: 16px; }
+.hero-content { flex: 1.2; display: flex; flex-direction: column; align-items: flex-start; z-index: 100; position: relative; }
+h1 { font-family: 'Syne', sans-serif; font-size: clamp(32px, 5vw, 64px); font-weight: 800; line-height: 1.1; letter-spacing: -2px; margin-bottom: 16px; color: #FFFFFF !important; }
 h1 em { color: var(--accent); font-style: normal; }
-.hero-sub { color: var(--muted); font-size: 16px; max-width: 480px; line-height: 1.7; margin-bottom: 32px; }
-.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
-.hero-visual { display: flex; justify-content: center; }
-.hero-chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; width: 100%; max-width: 380px; }
+.hero-sub { color: #9CA3AF !important; font-size: 17px; max-width: 500px; line-height: 1.7; margin-bottom: 32px; opacity: 1 !important; }
+.hero-btns { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
+.hero-visual { flex: 1; display: flex; justify-content: flex-end; z-index: 50; }
+.hero-chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; width: 100%; max-width: 380px; height: 220px; position: relative; overflow: hidden; }
 .hcb-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .hcb-name { font-size: 13px; color: var(--muted); font-weight: 500; }
 .hcb-val { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; }
